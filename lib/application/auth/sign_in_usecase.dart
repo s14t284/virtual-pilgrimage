@@ -9,17 +9,20 @@ import 'package:virtualpilgrimage/logger.dart';
 
 final signInUsecaseProvider = Provider.autoDispose<SignInUsecase>(
   (ref) => SignInInteractor(
-    ref.watch(emailAndPasswordAuthRepositoryProvider),
-    ref.watch(googleAuthRepositoryProvider),
-    ref.watch(userRepositoryProvider),
-    ref.watch(loggerProvider),
-    ref.watch(firebaseCrashlyticsProvider),
-    ref.watch(firebaseAuthProvider),
+    ref.read(emailAndPasswordAuthRepositoryProvider),
+    ref.read(googleAuthRepositoryProvider),
+    ref.read(appleAuthRepositoryProvider),
+    ref.read(userRepositoryProvider),
+    ref.read(loggerProvider),
+    ref.read(firebaseCrashlyticsProvider),
+    ref.read(firebaseAuthProvider),
   ),
 );
 
 abstract class SignInUsecase {
   Future<VirtualPilgrimageUser> signInWithGoogle();
+
+  Future<VirtualPilgrimageUser> signInWithApple();
 
   Future<VirtualPilgrimageUser> signInWithEmailAndPassword(
     String email,

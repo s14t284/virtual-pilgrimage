@@ -13,6 +13,8 @@ extension AnalyticsEvent on String {
   static const signInWithEmailAndPasswordFailed = 'sign_in_with_email_and_password_failed';
   static const signInWithGoogle = 'sign_in_with_google';
   static const signInWithGoogleFailed = 'sign_in_with_google_failed';
+  static const signInWithApple = 'sign_in_with_apple';
+  static const signInWithAppleFailed = 'sign_in_with_apple_failed';
   static const logout = 'logout';
   static const moveEditPage = 'move_edit_page';
   static const pressedRegistration = 'pressed_registration';

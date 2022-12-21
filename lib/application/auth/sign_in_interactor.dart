@@ -8,15 +8,19 @@ import 'package:virtualpilgrimage/domain/exception/database_exception.dart';
 import 'package:virtualpilgrimage/domain/exception/sign_in_exception.dart';
 import 'package:virtualpilgrimage/domain/user/virtual_pilgrimage_user.codegen.dart';
 
-enum _LoginMethod {
+enum LoginMethod {
   emailAndPassword,
   google,
+  apple,
 }
+
+typedef SignInMethodType = Future<UserCredential?> Function({String? email, String? password});
 
 class SignInInteractor extends SignInUsecase {
   SignInInteractor(
     this._emailAndPasswordAuthRepository,
     this._googleAuthRepository,
+    this._appleAuthRepository,
     this._userRepository,
     this._logger,
     this._crashlytics,
@@ -25,6 +29,7 @@ class SignInInteractor extends SignInUsecase {
 
   final AuthRepository _emailAndPasswordAuthRepository;
   final AuthRepository _googleAuthRepository;
+  final AuthRepository _appleAuthRepository;
   final UserRepository _userRepository;
   final Logger _logger;
   final FirebaseCrashlytics _crashlytics;
@@ -32,26 +37,12 @@ class SignInInteractor extends SignInUsecase {
 
   @override
   Future<VirtualPilgrimageUser> signInWithGoogle() async {
-    final credential = await _googleAuthRepository.signIn();
-    // Firebase から取得した Credential 情報の null check
-    if (credential == null || credential.user == null) {
-      const message = 'signin with google result is null';
-      _logger.e(
-        message,
-      );
-      await _crashlytics.log(message);
-      throw SignInException(
-        message: message,
-        status: SignInExceptionStatus.credentialIsNull,
-      );
-    }
-    final credentialUser = credential.user!;
+    return _signIn(_googleAuthRepository.signIn, LoginMethod.google);
+  }
 
-    await _crashlytics.setUserIdentifier(credentialUser.uid);
-    return _signInWithCredentialUser(
-      credentialUser,
-      _LoginMethod.google,
-    );
+  @override
+  Future<VirtualPilgrimageUser> signInWithApple() async {
+    return _signIn(_appleAuthRepository.signIn, LoginMethod.apple);
   }
 
   @override
@@ -59,28 +50,11 @@ class SignInInteractor extends SignInUsecase {
     String email,
     String password,
   ) async {
-    final credential = await _emailAndPasswordAuthRepository.signIn(
+    return _signIn(
+      _emailAndPasswordAuthRepository.signIn,
+      LoginMethod.emailAndPassword,
       email: email,
       password: password,
-    );
-    // Firebase から取得した Credential 情報の null check
-    if (credential == null || credential.user == null) {
-      const message = 'signin with google result is null';
-      _logger.e(
-        message,
-      );
-      await _crashlytics.log(message);
-      throw SignInException(
-        message: message,
-        status: SignInExceptionStatus.credentialIsNull,
-      );
-    }
-    final credentialUser = credential.user!;
-
-    await _crashlytics.setUserIdentifier(credentialUser.uid);
-    return _signInWithCredentialUser(
-      credentialUser,
-      _LoginMethod.emailAndPassword,
     );
   }
 
@@ -90,9 +64,29 @@ class SignInInteractor extends SignInUsecase {
     await _firebaseAuth.signOut();
   }
 
+  Future<VirtualPilgrimageUser> _signIn(
+    SignInMethodType f,
+    LoginMethod method, {
+    String? email,
+    String? password,
+  }) async {
+    final credential = await f(email: email, password: password);
+    // Firebase から取得した Credential 情報の null check
+    if (credential == null || credential.user == null) {
+      final message = 'signin with ${method.name} result is null';
+      _logger.e(message);
+      await _crashlytics.log(message);
+      throw SignInException(message: message, status: SignInExceptionStatus.credentialIsNull);
+    }
+    final credentialUser = credential.user!;
+
+    await _crashlytics.setUserIdentifier(credentialUser.uid);
+    return _signInWithCredentialUser(credentialUser, method);
+  }
+
   Future<VirtualPilgrimageUser> _signInWithCredentialUser(
     User credentialUser,
-    _LoginMethod loginMethod,
+    LoginMethod loginMethod,
   ) async {
     final signInMessage = 'signin with $loginMethod'
         '[userId][${credentialUser.uid}]'

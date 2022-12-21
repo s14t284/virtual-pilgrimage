@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
@@ -110,10 +112,7 @@ class _SignInPageBody extends StatelessWidget {
             padding: EdgeInsets.only(top: 16),
             child: Text(
               'または',
-              style: TextStyle(
-                fontSize: FontSize.mediumSize,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: FontSize.mediumSize, fontWeight: FontWeight.bold),
             ),
           ),
           Padding(
@@ -122,15 +121,23 @@ class _SignInPageBody extends StatelessWidget {
               child: SignInButton(
                 Buttons.GoogleDark,
                 text: 'Google でサインイン',
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                onPressed: () async {
-                  await notifier.signInWithGoogle();
-                },
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                onPressed: () => notifier.signInWithGoogle(),
               ),
             ),
-          )
+          ),
+          if (Platform.isIOS)
+            Padding(
+              padding: const EdgeInsets.only(top: 16),
+              child: Center(
+                child: SignInButton(
+                  Buttons.AppleDark,
+                  text: 'AppleID でサインイン',
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  onPressed: () => notifier.signInWithApple(),
+                ),
+              ),
+            )
         ],
       ),
     );

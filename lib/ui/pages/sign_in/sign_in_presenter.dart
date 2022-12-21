@@ -16,6 +16,8 @@ final signInPresenterProvider = StateNotifierProvider.autoDispose<SignInPresente
   SignInPresenter.new,
 );
 
+typedef SignInWithOAuthFunction = Future<VirtualPilgrimageUser> Function();
+
 class SignInPresenter extends StateNotifier<SignInState> {
   SignInPresenter(
     this._ref,
@@ -45,10 +47,37 @@ class SignInPresenter extends StateNotifier<SignInState> {
 
   void onChangePassword(FormModel password) => state = state.onChangePassword(password);
 
+  /// Google認証
   Future<void> signInWithGoogle() async {
-    unawaited(_analytics.logEvent(eventName: AnalyticsEvent.signInWithGoogle));
+    await _signInWithOAuthProvider(
+      _signInUsecase.signInWithGoogle,
+      AnalyticsEvent.signInWithGoogle,
+      AnalyticsEvent.signInWithGoogleFailed,
+    );
+  }
+
+  /// AppleID認証
+  Future<void> signInWithApple() async {
+    await _signInWithOAuthProvider(
+      _signInUsecase.signInWithApple,
+      AnalyticsEvent.signInWithApple,
+      AnalyticsEvent.signInWithAppleFailed,
+    );
+  }
+
+  /// OAuth Provider を利用したサインインを行う
+  ///
+  /// [f] UseCaseに実装しているSignInメソッド
+  /// [signInEventName] GoogleAnalytics に記録するイベント名
+  /// [exceptionEventName] 例外が発生した時に GoogleAnalytics に記録するイベント名
+  Future<void> _signInWithOAuthProvider(
+    SignInWithOAuthFunction f,
+    String signInEventName,
+    String exceptionEventName,
+  ) async {
+    unawaited(_analytics.logEvent(eventName: signInEventName));
     try {
-      final user = await _signInUsecase.signInWithGoogle();
+      final user = await f();
       state = SignInState(
         context: _getSignInContext(user),
         emailOrNickname: state.emailOrNickname,
@@ -58,23 +87,20 @@ class SignInPresenter extends StateNotifier<SignInState> {
       _updateState(user, user.userStatus);
     } on Exception catch (e) {
       _ref.read(loggerProvider).e(e);
-      unawaited(
-        _analytics.logEvent(
-          eventName: AnalyticsEvent.signInWithGoogleFailed,
-          parameters: {'error': e},
-        ),
-      );
+      unawaited(_analytics.logEvent(eventName: exceptionEventName, parameters: {'error': e}));
       unawaited(_crashlytics.recordError(e, null));
     }
   }
 
+  /// Email And Password 認証
   Future<void> signInWithEmailAndPassword() async {
+    final defaultParams = {
+      'email': state.emailOrNickname.text,
+      'passwordLength': state.password.text.length
+    };
     await _analytics.logEvent(
       eventName: AnalyticsEvent.signInWithEmailAndPassword,
-      parameters: {
-        'email': state.emailOrNickname.text,
-        'passwordLength': state.password.text.length
-      },
+      parameters: defaultParams,
     );
     state = state.onSubmit();
     // バリデーションエラーにかかっている場合はリクエストを送らない
@@ -83,8 +109,7 @@ class SignInPresenter extends StateNotifier<SignInState> {
         _analytics.logEvent(
           eventName: AnalyticsEvent.signInWithEmailAndPasswordFailed,
           parameters: {
-            'email': state.emailOrNickname.text,
-            'passwordLength': state.password.text.length,
+            ...defaultParams,
             'emailValidationError': state.emailOrNickname.displayError,
             'passwordValidationError': state.password.displayError,
           },

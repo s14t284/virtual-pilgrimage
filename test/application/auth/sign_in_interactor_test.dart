@@ -15,22 +15,15 @@ import '../../helper/mock.mocks.dart';
 import '../../helper/provider_container.dart';
 
 void main() {
-  MockEmailAndPasswordAuthRepository mockEmailAndPasswordAuthRepository =
-      MockEmailAndPasswordAuthRepository();
-  MockGoogleAuthRepository mockGoogleAuthRepository = MockGoogleAuthRepository();
-  MockUserRepository mockUserRepository = MockUserRepository();
-  MockFirebaseCrashlytics mockFirebaseCrashlytics = MockFirebaseCrashlytics();
-  MockFirebaseAuth mockFirebaseAuth = MockFirebaseAuth();
+  late MockEmailAndPasswordAuthRepository mockEmailAndPasswordAuthRepository;
+  late MockGoogleAuthRepository mockGoogleAuthRepository;
+  late MockAppleAuthRepository mockAppleAuthRepository;
+  late MockUserRepository mockUserRepository;
+  late MockFirebaseCrashlytics mockFirebaseCrashlytics;
+  late MockFirebaseAuth mockFirebaseAuth;
   final logger = Logger(level: Level.nothing);
 
-  SignInInteractor target = SignInInteractor(
-    mockEmailAndPasswordAuthRepository,
-    mockGoogleAuthRepository,
-    mockUserRepository,
-    logger,
-    mockFirebaseCrashlytics,
-    mockFirebaseAuth,
-  );
+  late SignInInteractor target;
 
   late MockUserCredential mockUserCredential;
   late MockUser mockUser;
@@ -40,12 +33,14 @@ void main() {
   setUp(() {
     mockEmailAndPasswordAuthRepository = MockEmailAndPasswordAuthRepository();
     mockGoogleAuthRepository = MockGoogleAuthRepository();
+    mockAppleAuthRepository = MockAppleAuthRepository();
     mockUserRepository = MockUserRepository();
     mockFirebaseCrashlytics = MockFirebaseCrashlytics();
     mockFirebaseAuth = MockFirebaseAuth();
     target = SignInInteractor(
       mockEmailAndPasswordAuthRepository,
       mockGoogleAuthRepository,
+      mockAppleAuthRepository,
       mockUserRepository,
       logger,
       mockFirebaseCrashlytics,
