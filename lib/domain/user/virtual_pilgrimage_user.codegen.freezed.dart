@@ -316,7 +316,7 @@ class _$_VirtualPilgrimageUser extends _VirtualPilgrimageUser {
       @JsonKey(fromJson: FirestoreTimestampConverter.timestampToDateTime, toJson: FirestoreTimestampConverter.dateTimeToTimestamp)
           required this.birthDay,
       this.email = '',
-      this.userIconUrl = 'https://maps.google.com/mapfiles/kml/shapes/info-i_maps.png',
+      this.userIconUrl = 'https://firebasestorage.googleapis.com/v0/b/virtual-pilgrimage-dev.appspot.com/o/icon512.jpg?alt=media',
       @JsonKey(fromJson: _UserStatusConverter.intToUserStatus, toJson: _UserStatusConverter.userStatusToInt)
           this.userStatus = UserStatus.temporary,
       @JsonKey(fromJson: FirestoreTimestampConverter.timestampToDateTime, toJson: FirestoreTimestampConverter.dateTimeToTimestamp)

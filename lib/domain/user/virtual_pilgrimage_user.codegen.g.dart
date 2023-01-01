@@ -18,7 +18,7 @@ _$_VirtualPilgrimageUser _$$_VirtualPilgrimageUserFromJson(
           json['birthDay'] as Timestamp),
       email: json['email'] as String? ?? '',
       userIconUrl: json['userIconUrl'] as String? ??
-          'https://maps.google.com/mapfiles/kml/shapes/info-i_maps.png',
+          'https://firebasestorage.googleapis.com/v0/b/virtual-pilgrimage-dev.appspot.com/o/icon512.jpg?alt=media',
       userStatus: json['userStatus'] == null
           ? UserStatus.temporary
           : _UserStatusConverter.intToUserStatus(json['userStatus'] as int),

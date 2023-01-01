@@ -7,6 +7,7 @@ import 'package:virtualpilgrimage/infrastructure/firebase/firebase_analytics_pro
 import 'package:virtualpilgrimage/logger.dart';
 import 'package:virtualpilgrimage/ui/pages/home/home_page.dart';
 import 'package:virtualpilgrimage/ui/pages/profile/profile_page.dart';
+import 'package:virtualpilgrimage/ui/pages/ranking/ranking_page.dart';
 import 'package:virtualpilgrimage/ui/pages/registration/registration_page.dart';
 import 'package:virtualpilgrimage/ui/pages/reset_password/reset_password_page.dart';
 import 'package:virtualpilgrimage/ui/pages/settings/settings_page.dart';
@@ -22,6 +23,7 @@ extension RouterPath on String {
   static const edit = '/edit';
   static const resetPassword = '/reset/password';
   static const settings = '/settings';
+  static const ranking = '/ranking';
 }
 
 // アニメーション抜きで即ページ遷移させるための設定
@@ -100,11 +102,19 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>(
           return const ResetPasswordPage();
         },
       ),
+      // 設定画面
       GoRoute(
         name: RouterPath.settings,
         path: RouterPath.settings,
         pageBuilder: (BuildContext context, GoRouterState state) =>
             zeroTransitionPage(const SettingsPage(), context),
+      ),
+      // ランキング
+      GoRoute(
+        name: RouterPath.ranking,
+        path: RouterPath.ranking,
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            zeroTransitionPage(const RankingPage(), context),
       ),
     ],
     redirect: (BuildContext context, GoRouterState state) {

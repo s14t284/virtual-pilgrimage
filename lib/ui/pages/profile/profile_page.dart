@@ -39,7 +39,7 @@ class ProfilePage extends ConsumerWidget {
     return Scaffold(
       appBar: const MyAppBar(),
       body: SafeArea(
-        // TODO(s14t284): loading, error 周りを整理する
+        // TODO(s14t284): error 時のUIを整理する
         child: user.when(
           data: (data) {
             if (data != null) {
@@ -175,7 +175,7 @@ class ProfilePageLoadingBody extends ConsumerWidget {
               child: CircularProgressIndicator(
                 strokeWidth: 16,
                 color: Theme.of(context).colorScheme.primary,
-                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                backgroundColor: Theme.of(context).colorScheme.onPrimary,
               ),
             ),
           ),

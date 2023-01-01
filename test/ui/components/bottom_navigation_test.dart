@@ -45,13 +45,13 @@ void main() {
       parent.read(userStateProvider.notifier).state = loginUser;
 
       // then
-      expect(parent.read(pageTypeProvider).index, 1);
+      expect(parent.read(pageTypeProvider).index, 2);
       // プロフィールアイコンをタップするとstateが更新
       await widgetTester.tap(find.byIcon(Icons.account_circle_outlined));
-      expect(parent.read(pageTypeProvider).index, 2);
+      expect(parent.read(pageTypeProvider).index, 3);
       // マップアイコンをタップするとstateが元に戻る
       await widgetTester.tap(find.byIcon(Icons.map_outlined));
-      expect(parent.read(pageTypeProvider).index, 1);
+      expect(parent.read(pageTypeProvider).index, 2);
     });
   });
 }

@@ -98,7 +98,7 @@ class VirtualPilgrimageUser with _$VirtualPilgrimageUser {
     @Default('')
         String email,
     // ユーザのプロフィール画像のURL
-    @Default('https://maps.google.com/mapfiles/kml/shapes/info-i_maps.png')
+    @Default('https://firebasestorage.googleapis.com/v0/b/virtual-pilgrimage-dev.appspot.com/o/icon512.jpg?alt=media')
         String userIconUrl,
     @Default(UserStatus.temporary)
     // ユーザの登録状態
@@ -145,9 +145,18 @@ class VirtualPilgrimageUser with _$VirtualPilgrimageUser {
   // ignore: prefer_constructors_over_static_methods
   static VirtualPilgrimageUser initializeForSignIn(User credentialUser) {
     final now = CustomizableDateTime.current;
-    // TODO(s14t284): ユーザアイコンのデフォルト値が画質が悪いので変えたい
-    final userIconUrl =
-        credentialUser.photoURL ?? 'https://maps.google.com/mapfiles/kml/shapes/info-i_maps.png';
+    String defaultProfileImageUrl() {
+      const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
+      switch (flavor) {
+        case 'prod':
+          return 'https://firebasestorage.googleapis.com/v0/b/virtual-pilgrimage-prd.appspot.com/o/icon512.jpg?alt=media';
+        case 'dev':
+        default:
+          return 'https://firebasestorage.googleapis.com/v0/b/virtual-pilgrimage-dev.appspot.com/o/icon512.jpg?alt=media';
+      }
+    }
+
+    final userIconUrl = credentialUser.photoURL ?? defaultProfileImageUrl();
     return VirtualPilgrimageUser(
       id: credentialUser.uid,
       birthDay: DateTime.utc(1980, 1, 1),
